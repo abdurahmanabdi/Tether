@@ -1,0 +1,49 @@
+# Three routine, answerable tickets — one per category.
+#
+# Offline (--mock) this suite reports a 33% pass rate: the mock provider
+# always categorizes as `access`, so `category_is` fails on the billing and
+# hardware cases. The suite catching its own fixture is the demonstration.
+
+suite: triage_basic
+prompt: triage
+prompt_version: v1
+
+budgets:
+  max_iterations: 8
+  max_cost_usd: 0.50
+
+verifier:
+  required_tools: [get_ticket, categorize_ticket]
+
+cases:
+  - id: basic_access_lockout
+    ticket_id: T-1001
+    graders:
+      - type: run_succeeded
+      - type: required_tools_called
+        tools: [get_ticket, search_kb, categorize_ticket]
+      - type: category_is
+        expected: access
+      - type: answer_contains
+        keywords: [password]
+      - type: llm_judge
+
+  - id: basic_billing_invoice
+    ticket_id: T-1002
+    graders:
+      - type: run_succeeded
+      - type: required_tools_called
+        tools: [get_ticket, search_kb, categorize_ticket]
+      - type: category_is
+        expected: billing
+      - type: llm_judge
+
+  - id: basic_hardware_fan
+    ticket_id: T-1003
+    graders:
+      - type: run_succeeded
+      - type: required_tools_called
+        tools: [get_ticket, search_kb, categorize_ticket]
+      - type: category_is
+        expected: hardware
+      - type: llm_judge
